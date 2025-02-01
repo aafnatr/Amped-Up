@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ball Catch Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+            position: relative;
+        }
+        canvas {
+            border: 2px solid white;
+        }
+        #score, #lives {
+            position: absolute;
+            top: 20px;
+            font-size: 20px;
+            margin: 0;
+        }
+        #lives {
+            right: 20px;
+        }
+        #replayButton {
+            display: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #FF5733;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #replayButton:hover {
+            background-color: #C74C29;
+        }
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #FF5733;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #backButton:hover {
+            background-color: #C74C29;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Back Button -->
+<button id="backButton" onclick="window.location.href='game.html';">Back</button>
+
+<canvas id="gameCanvas" width="750" height="500"></canvas>
+<div id="score">Score: 0</div>
+<div id="lives">Lives: 3</div>
+<button id="replayButton" onclick="startGame()">Replay</button>
+
+<script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let score, lives, paddleWidth, paddleHeight, ballRadius;
+    let paddleX, ballX, ballY, ballSpeedX, ballSpeedY;
+    let rightPressed, leftPressed;
+
+    // Game initialization
+    function startGame() {
+        // Reset the game
+        score = 0;
+        lives = 3;
+        paddleWidth = 100;
+        paddleHeight = 10;
+        ballRadius = 10;
+
+        paddleX = (canvas.width - paddleWidth) / 2;
+        ballX = canvas.width / 2;
+        ballY = canvas.height - 30;
+        ballSpeedX = 4;
+        ballSpeedY = -4;
+
+        rightPressed = false;
+        leftPressed = false;
+
+        // Hide replay button and reset canvas visibility
+        document.getElementById("replayButton").style.display = "none";
+        canvas.style.display = "block";
+        document.getElementById("score").style.display = "block";
+        document.getElementById("lives").style.display = "block";
+
+        // Restart the game loop
+        draw();
+    }
+
+    // Keyboard event listeners
+    document.addEventListener("keydown", keyDownHandler, false);
+    document.addEventListener("keyup", keyUpHandler, false);
+
+    function keyDownHandler(e) {
+        if (e.key == "Right" || e.key == "ArrowRight") {
+            rightPressed = true;
+        } else if (e.key == "Left" || e.key == "ArrowLeft") {
+            leftPressed = true;
+        }
+    }
+
+    function keyUpHandler(e) {
+        if (e.key == "Right" || e.key == "ArrowRight") {
+            rightPressed = false;
+        } else if (e.key == "Left" || e.key == "ArrowLeft") {
+            leftPressed = false;
+        }
+    }
+
+    function drawBall() {
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = "#00FF00";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function drawPaddle() {
+        ctx.beginPath();
+        ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+        ctx.fillStyle = "#FF5733";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function drawScore() {
+        document.getElementById("score").textContent = "Score: " + score;
+    }
+
+    function drawLives() {
+        document.getElementById("lives").textContent = "Lives: " + lives;
+    }
+
+    function collisionDetection() {
+        if (ballY + ballSpeedY > canvas.height - ballRadius) {
+            if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+                ballSpeedY = -ballSpeedY;
+                score += 10;
+            } else {
+                lives--;
+                if (!lives) {
+                    // Show replay button when game is over
+                    document.getElementById("replayButton").style.display = "inline-block";
+                    canvas.style.display = "none"; // Hide the game canvas
+                    document.getElementById("score").style.display = "none";
+                    document.getElementById("lives").style.display = "none";
+                    alert("GAME OVER!");
+                    return; // Stop the game loop
+                } else {
+                    ballX = canvas.width / 2;
+                    ballY = canvas.height - 30;
+                    ballSpeedX = 2;
+                    ballSpeedY = -2;
+                    paddleX = (canvas.width - paddleWidth) / 2;
+                }
+            }
+        }
+    }
+
+    function movePaddle() {
+        if (rightPressed && paddleX < canvas.width - paddleWidth) {
+            paddleX += 7;
+        } else if (leftPressed && paddleX > 0) {
+            paddleX -= 7;
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+        drawBall();
+        drawPaddle();
+        drawScore();
+        drawLives();
+        collisionDetection();
+        movePaddle();
+
+        // Ball movement
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+
+        // Ball bouncing
+        if (ballX + ballSpeedX > canvas.width - ballRadius || ballX + ballSpeedX < ballRadius) {
+            ballSpeedX = -ballSpeedX;
+        }
+        if (ballY + ballSpeedY < ballRadius) {
+            ballSpeedY = -ballSpeedY;
+        }
+
+        requestAnimationFrame(draw); // Keep the game going
+    }
+
+    // Start the game when the page loads
+    startGame();
+</script>
+
+</body>
+</html>
