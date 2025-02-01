@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1a1a1a;
+            color: #ecf0f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+            position: relative;
+        }
+        h1 {
+            color: #ff8c00;
+        }
+        .word-container {
+            font-size: 28px;
+            letter-spacing: 10px;
+            margin-top: 20px;
+        }
+        .hint {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #ffcc80;
+        }
+        .letters {
+            margin-top: 20px;
+        }
+        .letter-btn {
+            font-size: 18px;
+            margin: 5px;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            background-color: #ff8c00;
+            color: #ecf0f1;
+            border-radius: 5px;
+        }
+        .letter-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffcc80;
+        }
+        .attempts {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #ff8c00;
+        }
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #FF5733;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #backButton:hover {
+            background-color: #C74C29;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Back Button -->
+<button id="backButton" onclick="window.location.href='game.html';">Back</button>
+
+<h1>Word Guessing Game</h1>
+<p>Guess the word by selecting letters.</p>
+
+<div class="word-container" id="word-display"></div>
+<p class="hint" id="hint"></p>
+
+<div class="letters" id="letters-container"></div>
+
+<p class="attempts">Wrong Attempts Left: <span id="attempts">5</span></p>
+<p class="message" id="message"></p>
+
+<button id="replayButton" onclick="startGame()">Replay</button>
+
+<script>
+    let words, selected, word, hint, displayWord, attemptsLeft;
+    const lettersContainer = document.getElementById("letters-container");
+    const message = document.getElementById("message");
+    const attemptsSpan = document.getElementById("attempts");
+
+    // Function to reset the game
+    function startGame() {
+        words = [
+            { word: "APPLE", hint: "A fruit that keeps the doctor away." },
+            { word: "COMPUTER", hint: "A device for computing." },
+            { word: "JAVASCRIPT", hint: "A popular programming language." },
+            { word: "MATH", hint: "The study of numbers, shapes, and patterns." },
+        ];
+        selected = words[Math.floor(Math.random() * words.length)];
+        word = selected.word;
+        hint = selected.hint;
+        displayWord = "_".repeat(word.length);
+        attemptsLeft = 5;
+
+        // Display word and hint
+        document.getElementById("word-display").textContent = displayWord;
+        document.getElementById("hint").textContent = hint;
+        message.textContent = "";
+        attemptsSpan.textContent = attemptsLeft;
+        lettersContainer.innerHTML = "";
+
+        // Create letter buttons
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        alphabet.forEach(letter => {
+            const button = document.createElement("button");
+            button.textContent = letter;
+            button.classList.add("letter-btn");
+            button.onclick = () => guessLetter(letter, button);
+            lettersContainer.appendChild(button);
+        });
+
+        // Show replay button only if game is over
+        document.getElementById("replayButton").style.display = "none";
+    }
+
+    // Function to handle letter guesses
+    function guessLetter(letter, button) {
+        button.disabled = true;
+        if (word.includes(letter)) {
+            displayWord = displayWord.split("").map((char, index) => {
+                return word[index] === letter ? letter : char;
+            }).join("");
+            document.getElementById("word-display").textContent = displayWord;
+
+            if (!displayWord.includes("_")) {
+                message.textContent = "Congratulations! You've guessed the word!";
+                document.getElementById("replayButton").style.display = "inline-block";
+            }
+        } else {
+            attemptsLeft--;
+            attemptsSpan.textContent = attemptsLeft;
+
+            if (attemptsLeft === 0) {
+                message.textContent = `Game Over! The word was: ${word}`;
+                document.getElementById("replayButton").style.display = "inline-block";
+            }
+        }
+    }
+
+    // Initialize the game
+    startGame();
+</script>
+
+</body>
+</html>
