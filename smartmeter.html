@@ -146,11 +146,25 @@
         #backButton:hover {
             background-color: #C74C29;
         }
+
+        /* Smart Points Display */
+        .smart-points {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #444;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ff8c00;
+        }
     </style>
 </head>
 <body>
 
     <button id="backButton" onclick="window.location.href='index.html';">Back</button>
+    <button onclick="updateSmartPoints()">Update Smart Points</button>
 
     <div class="container">
         <h1>Smart Meter - Energy Consumption Analysis</h1>
@@ -265,115 +279,130 @@
                 <li>Optimize heating and cooling systems.</li>
             </ul>
         </div>
+
+        <!-- Smart Points Display -->
+        <div id="smartPoints" class="smart-points">
+            <p id="smartPointsMessage"></p>
+        </div>
     </div>
 
     <script>
         // Initialize Chart
         const ctx = document.getElementById('energyChart').getContext('2d');
         let energyChart;
-
-        // Data Storage
         let monthlyData = {};
 
-        // Form Submission Handler
         document.getElementById('energyForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
-            // Get Input Values
             const month = document.getElementById('month').value;
             const week1 = parseFloat(document.getElementById('week1').value);
             const week2 = parseFloat(document.getElementById('week2').value);
             const week3 = parseFloat(document.getElementById('week3').value);
             const week4 = parseFloat(document.getElementById('week4').value);
 
-            // Save Weekly Data by Month
-            if (!monthlyData[month]) {
-                monthlyData[month] = [];
-            }
-            monthlyData[month] = [week1, week2, week3, week4];
-
-            // Calculate Monthly Total
-            const monthlyTotal = week1 + week2 + week3 + week4;
-
             // Update Table with User Input
             document.getElementById('week1Value').textContent = week1;
             document.getElementById('week2Value').textContent = week2;
             document.getElementById('week3Value').textContent = week3;
             document.getElementById('week4Value').textContent = week4;
-            document.getElementById('monthlyTotal').textContent = monthlyTotal;
 
-            // Get Selected Chart Type and Analysis Type
+            const total = week1 + week2 + week3 + week4;
+            document.getElementById('monthlyTotal').textContent = total;
+
+            // Store data in monthlyData
+            monthlyData[month] = { week1, week2, week3, week4, total };
+
+            // Get chart type
             const chartType = document.querySelector('input[name="chartType"]:checked').value;
-            const analysisType = document.querySelector('input[name="analysisType"]:checked').value;
 
-            // Prepare Data for Chart
-            let labels, data;
-            if (analysisType === 'weekly') {
-                labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-                data = [week1, week2, week3, week4];
-            } else if (analysisType === 'monthly') {
-                labels = Object.keys(monthlyData);
-                data = labels.map(month => monthlyData[month].reduce((a, b) => a + b, 0));
-            } else if (analysisType === 'yearly') {
-                labels = ['Yearly Total'];
-                data = [Object.values(monthlyData).flat().reduce((a, b) => a + b, 0)];
-            }
+            // Set up chart data
+            const data = {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: `Energy Consumption for ${month} (kWh)`,
+                    data: [week1, week2, week3, week4],
+                    backgroundColor: chartType === 'bar' ? 'rgba(255, 140, 0, 0.7)' : 'rgba(0, 123, 255, 0.7)',
+                    borderColor: chartType === 'bar' ? '#ff8c00' : '#007bff',
+                    borderWidth: 1
+                }]
+            };
 
-            // Destroy Existing Chart
+            const options = {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        enabled: true,
+                    }
+                }
+            };
+
             if (energyChart) {
                 energyChart.destroy();
             }
 
-            // Create New Chart
+            // Create Bar or Pie chart based on user selection
             energyChart = new Chart(ctx, {
-                type: chartType, // Dynamic Chart Type
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Energy Consumption (kWh)',
-                        data: data,
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.6)',
-                            'rgba(54, 162, 235, 0.6)',
-                            'rgba(255, 206, 86, 0.6)',
-                            'rgba(75, 192, 192, 0.6)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: analysisType === 'weekly' ? 'Weekly Energy Consumption' :
-                                  analysisType === 'monthly' ? 'Monthly Energy Consumption' :
-                                  'Yearly Energy Consumption'
-                        }
-                    }
-                }
+                type: chartType,
+                data: data,
+                options: options
             });
 
-            // Provide Feedback Based on Monthly Consumption
-            const feedbackSection = document.getElementById('feedback');
-            const feedbackMessage = document.getElementById('feedbackMessage');
-
-            if (monthlyTotal >= 200) {
-                feedbackMessage.textContent = "Your monthly energy consumption is high. Consider adopting energy-saving practices to reduce your consumption.";
-                feedbackSection.style.display = 'block';
-            } else {
-                feedbackSection.style.display = 'none';
-            }
+            // Show Feedback and Smart Points
+            showFeedback(total);
+            updateSmartPoints(total);
         });
+
+        // Show feedback based on consumption
+        function showFeedback(total) {
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const feedbackSection = document.getElementById('feedback');
+            feedbackSection.style.display = 'block';
+            
+            if (total < 100) {
+                feedbackMessage.textContent = 'Great job! Your energy consumption is low.';
+            } else if (total >= 100 && total <= 200) {
+                feedbackMessage.textContent = 'Your energy consumption is moderate. Consider ways to reduce it further.';
+            } else {
+                feedbackMessage.textContent = 'Your energy consumption is high. We recommend taking action to reduce it.';
+            }
+        }
+
+        // Update smart points
+        function updateSmartPoints(total) {
+        const smartPointsSection = document.getElementById('smartPoints');
+        const smartPointsMessage = document.getElementById('smartPointsMessage');
+        let points = 0;
+        
+        if (total < 100) {
+            points += 20;
+        } else if (total >= 100 && total <= 150) {
+            points += 10;
+        } else if (total > 150 && total <= 200) {
+            points += 5;
+        } else {
+            points += 0;
+        }
+
+    smartPointsMessage.textContent = `Congratulations!! You got ${points} smart-points ⭐`;
+    smartPointsSection.style.display = 'block';
+
+    // Save points in localStorage (incrementing any existing points)
+    let currentPoints = parseInt(localStorage.getItem('smartPoints')) || 0;
+    currentPoints += points;  // Add new points to the current total
+    localStorage.setItem('smartPoints', currentPoints);
+        }
+
+            smartPointsMessage.textContent = `Congratulations!! You got ${points} smart-points ⭐`;
+            smartPointsSection.style.display = 'block';
+
+            // Save points in localStorage
+            localStorage.setItem('smartPoints', points);
+        
     </script>
 </body>
 </html>
+
