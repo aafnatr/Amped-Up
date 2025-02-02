@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - Amped Up</title>
+    <title>Amped Up</title>
     <style>
         body {
             margin: 0;
@@ -25,11 +25,10 @@
         /* Logo */
         .logo img {
             height: 100px;
-            cursor: pointer; /* Makes the logo appear clickable */
         }
 
         .title {
-            text-align: right;
+            text-align: center;
         }
 
         .title h1 {
@@ -42,6 +41,15 @@
             font-size: 1.5em;
             margin: 5px 0 0;
             color: #ffcc80;
+        }
+
+        /* Smart Points Section */
+        .smart-points {
+            color: #ffdd00;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin-left: 20px;
         }
 
         /* Tabs Section */
@@ -67,34 +75,32 @@
             background-color: #555;
         }
 
-        /* Content Section */
+        /* Three-column layout */
         .container {
+            display: flex;
+            justify-content: space-between;
             padding: 20px;
         }
 
-        h2, h3 {
-            color: #ff8c00;
-        }
-
-        p, ul {
+        .column {
+            flex: 1;
+            background-color: #333;
+            margin: 10px;
+            padding: 20px;
+            text-align: center;
             font-size: 1.2em;
-            line-height: 1.6;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border-radius: 15px; /* Rounded corners */
         }
 
-        ul {
-            margin-left: 20px;
-        }
-
-        li {
-            margin-bottom: 15px;
-        }
-
-        li strong {
-            color: #ffcc80;
+        .column:hover {
+            background-color: #555;
         }
     </style>
 </head>
 <body>
+    <!-- Header Section -->
     <div class="header">
         <div class="logo">
             <a href="index.html">
@@ -105,16 +111,33 @@
             <h1>Amped Up</h1>
             <p>Watts the future? Power smart, Live smart</p>
         </div>
+        <!-- Smart Points Display -->
+        <div id="smartPointsDisplay" class="smart-points">
+            Smart Points: 0
+        </div>
     </div>
 
+    <!-- Tabs Section -->
     <div class="tabs">
         <a href="about.html" class="tab">About</a>
         <a href="map.html" class="tab">Energy Zones</a>
-        <a href="smartmeter.html" class="tab">Smart Meter</a> <!-- Changed href to point to map.html -->
+        <a href="smartmeter.html" class="tab">Smart Meter</a>
         <a href="game.html" class="tab">Game</a>
         <a href="contact.html" class="tab">Contact</a>
     </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // For demonstration, assuming this value comes from your smart meter calculations
+            let smartPoints = 20; // Example points
+
+            // Update the Smart Points Display in the Header
+            const smartPointsDisplay = document.getElementById('smartPointsDisplay');
+            if (smartPointsDisplay) {
+                smartPointsDisplay.innerHTML = `Smart Points: ${smartPoints}`;
+            }
+        });
+    </script>
     <div class="container">
         <h2>About Amped Up</h2>
         <p>
