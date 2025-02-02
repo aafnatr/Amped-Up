@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amped Up</title>
+    <title>About Us - Amped Up</title>
     <style>
         body {
             margin: 0;
@@ -25,6 +25,7 @@
         /* Logo */
         .logo img {
             height: 100px;
+            cursor: pointer; /* Makes the logo appear clickable */
         }
 
         .title {
@@ -75,32 +76,34 @@
             background-color: #555;
         }
 
-        /* Three-column layout */
+        /* Content Section */
         .container {
-            display: flex;
-            justify-content: space-between;
             padding: 20px;
         }
 
-        .column {
-            flex: 1;
-            background-color: #333;
-            margin: 10px;
-            padding: 20px;
-            text-align: center;
+        h2, h3 {
+            color: #ff8c00;
+        }
+
+        p, ul {
             font-size: 1.2em;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            border-radius: 15px; /* Rounded corners */
+            line-height: 1.6;
         }
 
-        .column:hover {
-            background-color: #555;
+        ul {
+            margin-left: 20px;
+        }
+
+        li {
+            margin-bottom: 15px;
+        }
+
+        li strong {
+            color: #ffcc80;
         }
     </style>
 </head>
 <body>
-    <!-- Header Section -->
     <div class="header">
         <div class="logo">
             <a href="index.html">
@@ -117,27 +120,16 @@
         </div>
     </div>
 
-    <!-- Tabs Section -->
+    
+
     <div class="tabs">
         <a href="about.html" class="tab">About</a>
         <a href="map.html" class="tab">Energy Zones</a>
-        <a href="smartmeter.html" class="tab">Smart Meter</a>
+        <a href="smartmeter.html" class="tab">Smart Meter</a> <!-- Changed href to point to map.html -->
         <a href="game.html" class="tab">Game</a>
         <a href="contact.html" class="tab">Contact</a>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // For demonstration, assuming this value comes from your smart meter calculations
-            let smartPoints = 20; // Example points
-
-            // Update the Smart Points Display in the Header
-            const smartPointsDisplay = document.getElementById('smartPointsDisplay');
-            if (smartPointsDisplay) {
-                smartPointsDisplay.innerHTML = `Smart Points: ${smartPoints}`;
-            }
-        });
-    </script>
     <div class="container">
         <h2>About Amped Up</h2>
         <p>
