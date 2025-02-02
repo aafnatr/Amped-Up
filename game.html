@@ -77,9 +77,9 @@
         }
 
         .game-button {
-            width: 40%; /* Reduced width for better layout */
-            height: 350px; /* Increased height */
-            background-color: transparent; /* Transparent background */
+            width: 40%;
+            height: 350px;
+            background-color: transparent;
             color: white;
             padding: 30px;
             border-radius: 20px;
@@ -90,11 +90,12 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Subtle shadow for aesthetic */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            position: relative;
         }
 
         .game-button img {
-            width: 60%; /* Adjusted image size */
+            width: 60%;
             border-radius: 10px;
             margin-bottom: 15px;
         }
@@ -102,7 +103,7 @@
         .game-button h2 {
             font-size: 2.2em;
             margin: 0;
-            color: #ff8c00; /* Accent color for titles */
+            color: #ff8c00;
         }
 
         .game-button p {
@@ -111,17 +112,36 @@
             color: #f1f1f1;
         }
 
-        /* Hover Effect for Button */
-        .game-button:hover {
+        /* Hover Effect for Enabled Buttons */
+        .game-button.enabled:hover {
             transform: scale(1.05);
-            background-color: rgba(169, 169, 169, 0.6); /* Light grey on hover */
+            background-color: rgba(169, 169, 169, 0.6);
         }
 
-        /* Game Description Section */
-        .game-description {
-            margin-top: 50px;
-            font-size: 1.2em;
-            color: #ffcc80;
+        /* Disabled Button Style */
+        .game-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Tooltip for Disabled Buttons */
+        .tooltip {
+            visibility: hidden;
+            background-color: #ff5555;
+            color: white;
+            text-align: center;
+            padding: 5px;
+            border-radius: 5px;
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        .disabled:hover .tooltip {
+            visibility: visible;
         }
     </style>
 </head>
@@ -152,21 +172,61 @@
     <!-- Game Buttons Section -->
     <div class="game-buttons">
         <!-- Game 1 Button -->
-        <a href="game1.html" class="game-button">
+        <div id="game1" class="game-button" onclick="playGame('game1.html')">
             <img src="https://i.pinimg.com/736x/cd/e0/a9/cde0a94f31e27aa7627df66c729726be.jpg" alt="Catch the Ball">
             <h2>Catch the Ball</h2>
             <p>Don't let the ball fall down.</p>
-            <p>10 Smart points </p>
-        </a>
+            <p>10 Smart Points</p>
+            <div class="tooltip">Not enough Smart Points</div>
+        </div>
 
         <!-- Game 2 Button -->
-        <a href="game2.html" class="game-button">
+        <div id="game2" class="game-button" onclick="playGame('game2.html')">
             <img src="https://i.pinimg.com/736x/49/32/33/493233dfcb61c2379cd47fdd2786e82d.jpg" alt="Guess the Word">
             <h2>Guess the Word</h2>
-            <p>Guess the word from the given clues within a time limit. Can you figure it out before time runs out?</p>
-            <p>10 Smart points </p>
-        </a>
+            <p>Guess the word from the given clues within a time limit.</p>
+            <p>10 Smart Points</p>
+            <div class="tooltip">Not enough Smart Points</div>
+        </div>
     </div>
+
+    <script>
+        function checkSmartPoints() {
+            const smartPoints = parseInt(localStorage.getItem('smartPoints')) || 0;
+
+            // Get game buttons
+            const game1 = document.getElementById('game1');
+            const game2 = document.getElementById('game2');
+
+            if (smartPoints < 10) {
+                game1.classList.add('disabled');
+                game1.onclick = null;
+
+                game2.classList.add('disabled');
+                game2.onclick = null;
+            } else {
+                game1.classList.remove('disabled');
+                game1.onclick = () => playGame('game1.html');
+
+                game2.classList.remove('disabled');
+                game2.onclick = () => playGame('game2.html');
+            }
+        }
+
+        function playGame(gameUrl) {
+            let smartPoints = parseInt(localStorage.getItem('smartPoints')) || 0;
+
+            if (smartPoints >= 10) {
+                localStorage.setItem('smartPoints', smartPoints - 10);
+                window.location.href = gameUrl;
+            } else {
+                alert("Not enough Smart Points to play this game!");
+            }
+        }
+
+        // Run function on page load
+        document.addEventListener("DOMContentLoaded", checkSmartPoints);
+    </script>
 
 </body>
 </html>
